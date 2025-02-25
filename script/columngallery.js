@@ -118,34 +118,65 @@ container.addEventListener(
   { passive: false }
 );
 
+// let touchStartY = 0;
+// container.addEventListener("touchstart", (e) => {
+//   if (isHorizontal) {
+//     touchStartY = e.touches[0].clientY;
+//   }
+// });
+
+let touchStartX = 0;
 let touchStartY = 0;
+
 container.addEventListener("touchstart", (e) => {
-  if (isHorizontal) {
-    touchStartY = e.touches[0].clientY;
-  }
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
 });
 
-container.addEventListener(
-  "touchmove",
-  (e) => {
-    if (isHorizontal) {
-      const touchY = e.touches[0].clientY;
-      const deltaY = touchStartY - touchY;
+// container.addEventListener(
+//   "touchmove",
+//   (e) => {
+//     if (isHorizontal) {
+//       const touchY = e.touches[0].clientY;
+//       const deltaY = touchStartY - touchY;
 
-      const delta = deltaY;
-      const scrollVelocity = Math.min(Math.max(delta * 0.5, -20), 20);
+//       const delta = deltaY;
+//       const scrollVelocity = Math.min(Math.max(delta * 0.5, -20), 20);
 
-      targetTranslate = Math.min(
-        Math.max(targetTranslate - scrollVelocity, -maxTranslate),
-        0
-      );
+//       targetTranslate = Math.min(
+//         Math.max(targetTranslate - scrollVelocity, -maxTranslate),
+//         0
+//       );
 
-      touchStartY = touchY;
-      e.preventDefault();
-    }
-  },
-  { passive: false }
-);
+//       touchStartY = touchY;
+//       e.preventDefault();
+//     }
+//   },
+//   { passive: false }
+// );
+
+container.addEventListener("touchmove", (e) => {
+  e.preventDefault(); // 기본 스크롤 동작 방지
+  
+  const touchX = e.touches[0].clientX;
+  const touchY = e.touches[0].clientY;
+  
+  // 수직/수평 이동 거리 계산
+  const deltaX = touchStartX - touchX;
+  const deltaY = touchStartY - touchY;
+  
+  // 주 스크롤 방향에 따라 다른 델타값 사용
+  const delta = isHorizontal ? deltaX : deltaY;
+  const scrollVelocity = Math.min(Math.max(delta * 0.5, -20), 20);
+  
+  targetTranslate = Math.min(
+    Math.max(targetTranslate - scrollVelocity, -maxTranslate),
+    0
+  );
+  
+  touchStartX = touchX;
+  touchStartY = touchY;
+}, { passive: false });
 
 itemElements.forEach((item, index) => {
   item.addEventListener("click", () => {
